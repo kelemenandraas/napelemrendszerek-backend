@@ -1,4 +1,4 @@
-# Napelemrendszerek - frontend
+# Napelemrendszerek - backend
 A rendszerfejlesztés korszerű módszerei (2022/23/2)- projektmunka 
 
 Németh Anna       -  FOXMJY
