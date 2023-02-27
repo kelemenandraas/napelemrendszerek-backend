@@ -14,11 +14,9 @@ namespace napelemrendszerek_backend.Models
         public Project Project { get; set; }
         public int projectID { get; set; }
 
-        public Part Part { get; set; }
-        public int partID { get; set; }
+        public ICollection<Part> Parts { get; set; }
 
-        public PartStates PartState { get; set; }
-        public int partStateID { get; set; }
+        public ICollection<PartStates> PartStates { get; set; }
 
     }
 }

@@ -163,11 +163,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Communication.cs" />
+    <Compile Include="DbServices.cs" />
     <Compile Include="Models\Compartment.cs" />
     <Compile Include="Models\Part.cs" />
     <Compile Include="Models\PartProjectConnection.cs" />
     <Compile Include="Models\PartStates.cs" />
     <Compile Include="Models\Project.cs" />
+    <Compile Include="Models\ProjectHistory.cs" />
     <Compile Include="Models\ProjectStates.cs" />
     <Compile Include="Models\Roles.cs" />
     <Compile Include="Models\SolarPanelContext.cs" />

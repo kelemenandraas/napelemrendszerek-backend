@@ -16,5 +16,7 @@ namespace napelemrendszerek_backend.Models
 
         //connection
         public ICollection<Project> Projects { get; set; }
+        public ICollection<ProjectHistory> ProjectHistories { get; set; }
+
     }
 }
