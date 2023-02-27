@@ -40,5 +40,10 @@ namespace napelemrendszerek_backend.Models
 
         public Users User { get; set; }
         public int createdBy { get; set; }
+
+        public ICollection<PartProjectConnection> partProjectConnections { get; set; }
+
+        public ICollection<ProjectHistory> projectHistory { get; set; }
+
     }
 }

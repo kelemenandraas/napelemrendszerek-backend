@@ -15,5 +15,6 @@ namespace napelemrendszerek_backend.Models
         public string partStateName { get; set; }
 
         //connection
+        public ICollection<PartProjectConnection> PartProjects { get; set; }
     }
 }
