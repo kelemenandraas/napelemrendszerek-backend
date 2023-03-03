@@ -1,7 +1,8 @@
 ﻿using System;
+using dotenv.net.Utilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-
+using dotenv.net;
 // Code scaffolded by EF Core assumes nullable reference types (NRTs) are not used or disabled.
 // If you have enabled NRTs for your project, then un-comment the following line:
 // #nullable disable
@@ -10,8 +11,10 @@ namespace napelemrendszerek_backend.DBModels
 {
     public partial class SolarDBContext : DbContext
     {
+
         public SolarDBContext()
         {
+            DotEnv.Load();
         }
 
         public SolarDBContext(DbContextOptions<SolarDBContext> options)
@@ -33,7 +36,8 @@ namespace napelemrendszerek_backend.DBModels
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=overkill.servegame.com,2017;Database=SolarDB;User Id=SolarBackend;Password=V33I*$2#5Uzx;");
+                var envVars = DotEnv.Read();
+                optionsBuilder.UseSqlServer($"Server={envVars["DB_URL"]},{envVars["DB_PORT"]};Database={envVars["DB"]};User Id={envVars["DB_USER"]};Password={envVars["DB_PASS"]};");
             }
         }
 
