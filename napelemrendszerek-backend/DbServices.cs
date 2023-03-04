@@ -55,20 +55,31 @@ namespace napelemrendszerek_backend
         }
 
         public void addUser(Users singleUser) {
-            //TODO ell. username
-            string hashedPassword = hash(singleUser.UserPassword);
-            singleUser.UserPassword = hashedPassword;
-            SPContext.Users.Add(singleUser);
-            Console.WriteLine($"username: {singleUser.Username} password: {singleUser.UserPassword}");
+            if (!SPContext.Users.Any(i => i.Username == singleUser.Username))
+            {
+                string hashedPassword = hash(singleUser.UserPassword);
+                singleUser.UserPassword = hashedPassword;
+                SPContext.Users.Add(singleUser);
+                Console.WriteLine($"username: {singleUser.Username} password: {singleUser.UserPassword}");
+                SPContext.SaveChanges();
+            }
+            else {
+                Console.WriteLine("hiba, benne van a felhasználó");
+                //TODO: jelzés a kliensnek? 
+            }
+            
+        }
+
+        public void addProject(object o) { 
+            Project p = (Project)o;
+            SPContext.Project.Add(p);
             SPContext.SaveChanges();
         }
 
-        public void addProject() { 
-            //TODO
-        }
-
-        public void addPart() { 
-            //TODO
+        public void addPart(object o) { 
+            Part p = (Part)o;
+            SPContext.Part.Add(p);
+            SPContext.SaveChanges();
         }
         private string hash(string password) {
 

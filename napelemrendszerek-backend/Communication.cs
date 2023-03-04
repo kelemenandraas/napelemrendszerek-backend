@@ -12,13 +12,15 @@ namespace Comm
         public string requestName { get; set; }
         public DateTime Date { get; set; }
         public object parameterObject { get; set; }
+        public int roleId { get; set; }
 
         public Communication() { }
-        public Communication(string request, object param)
+        public Communication(string request, object param, int roleId)
         {
             this.requestName = request;
             this.Date = DateTime.Now;
-            parameterObject = param;
+            this.parameterObject = param;
+            this.roleId = roleId;
         }
 
         public override string ToString()
