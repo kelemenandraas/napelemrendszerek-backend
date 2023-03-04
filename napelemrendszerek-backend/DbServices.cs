@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using napelemrendszerek_backend.DBModels;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using System.Security.Cryptography;
 
 namespace napelemrendszerek_backend
 {
@@ -45,13 +47,20 @@ namespace napelemrendszerek_backend
 
             SPContext.SaveChanges();
         }
-        public void teszt() {
-            var a = SPContext.Part.Where(p => p.PartId == 1).Single();
-            Console.WriteLine(a.PartId);
+
+        public void teszt(object r) {
+            Users u = (Users)r;
+            Console.WriteLine("Teszt");
+            Console.WriteLine(u.ToString());
         }
 
-        public void addUser() { 
-            //TODO
+        public void addUser(Users singleUser) {
+            //TODO ell. username
+            string hashedPassword = hash(singleUser.UserPassword);
+            singleUser.UserPassword = hashedPassword;
+            SPContext.Users.Add(singleUser);
+            Console.WriteLine($"username: {singleUser.Username} password: {singleUser.UserPassword}");
+            SPContext.SaveChanges();
         }
 
         public void addProject() { 
@@ -61,6 +70,17 @@ namespace napelemrendszerek_backend
         public void addPart() { 
             //TODO
         }
+        private string hash(string password) {
 
+            byte[] salt = new byte[16]; 
+            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                password: password,
+                salt: salt,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 256 / 8));
+
+            return hashed;
+        }
     }
 }
