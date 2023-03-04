@@ -88,7 +88,7 @@ namespace SocketServer
         }
         private static Communication Response(Communication request)
         {
-            Communication response = new Communication(request.Message + " (Server)");
+            Communication response = new Communication(request.requestName + " (Server)", null);
             return response;
         }
     }
