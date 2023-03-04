@@ -1,4 +1,6 @@
 ﻿using Comm;
+using napelemrendszerek_backend;
+using napelemrendszerek_backend.DBModels;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -88,7 +90,7 @@ namespace SocketServer
         }
         private static Communication Response(Communication request)
         {
-            Communication response = new Communication(request.requestName + " (Server)", null);
+            Communication response = new Communication(request.requestName + " (Server)", null , 1);
             return response;
         }
     }
