@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using napelemrendszerek_backend.DBModels;
+using napelemrendszerek_backend.Models;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Security.Cryptography;
 using Comm;
@@ -14,8 +14,10 @@ namespace napelemrendszerek_backend
     class DbServices
     {
         SolarDBContext SPContext = new SolarDBContext();
+        Communication response;
         public DbServices()
         {
+            response= new Communication();
             SPContext.Part.Load();
             SPContext.Users.Load();
             SPContext.Roles.Load();
@@ -26,22 +28,27 @@ namespace napelemrendszerek_backend
             SPContext.PartStates.Load();
         }
 
-        public List<Project>  getAllProjects() {
-            //TODO kiszűrni az adott oszlopokat
-            return SPContext.Project.ToList();
+        public Communication getResponse (){
+            return response;
         }
 
-        public List<Project> getSingleProject(object o) {
+        private void  getAllProjects() {
+            //TODO kiszűrni az adott oszlopokat
+            response.Message = "nodata";
+            response.contentObject = SPContext.Project.ToList();
+        }
+
+        private List<Project> getSingleProject(object o) {
             int projectID = Convert.ToInt32(o.ToString());
             return SPContext.Project.Where(p => p.ProjectId == projectID).ToList();
         }
-
-        public List<Part> getParts() {
+        
+        private List<Part> getParts() {
             //TODO kiszűrni a db/dobozt
             return SPContext.Part.ToList();
         }
 
-        public void changeProjectState(int projectID,int stateID ) {
+        private void changeProjectState(int projectID,int stateID ) {//dic
 
             var selectedProject = SPContext.Project.Where(p => p.ProjectId == projectID).Single();
             selectedProject.ProjectStateId = stateID;
@@ -49,13 +56,8 @@ namespace napelemrendszerek_backend
             SPContext.SaveChanges();
         }
 
-        public void teszt(object r) {
-            Users u = (Users)r;
-            Console.WriteLine("Teszt");
-            Console.WriteLine(u.ToString());
-        }
+        private void addUser(object o) {
 
-        public void addUser(object o) {
             Users singleUser = (Users)o;
             if (!SPContext.Users.Any(i => i.Username == singleUser.Username))
             {
@@ -71,24 +73,29 @@ namespace napelemrendszerek_backend
             }
         }
 
-        public void addProject(object o) { 
+        private void addProject(object o) { 
             Project p = (Project)o;
             //TODO: létezik már?
             SPContext.Project.Add(p);
             SPContext.SaveChanges();
         }
 
-        public void addPart(object o) { 
+        private void addPart(object o) {
+            if (!(o is Part))
+            {
+                response.Message = "failed";
+                //hiba
+            }
             Part p = (Part)o;
             //TODO: létezik már?
             SPContext.Part.Add(p);
             SPContext.SaveChanges();
         }
-        public void modifyPartPrice(object o)
+        private void modifyPartPrice(object o)
         {
             //feltételezve hogy egy létező (adatb-ben létező id) partot kapunk, más árral
             Part p = (Part)o;
-            var modifiedPart = SPContext.Part.FirstOrDefault(i => i.PartId == p.PartId);
+            var modifiedPart = SPContext.Part.FirstOrDefault(i => i.PartName == p.PartName);
             if (modifiedPart != null)
             {
                 modifiedPart.SellPrice = p.SellPrice;
@@ -112,28 +119,58 @@ namespace napelemrendszerek_backend
 
             return hashed;
         }
+        private void login(object o)
+        {
+            if (!(o is Dictionary<string,string>))
+            {
+                //hiba
+                response.Message = "failed";
+                return;
+            }
+            Dictionary<string, string> userDic = (Dictionary<string, string>)o;
+            var user = SPContext.Users.Where(x=>x.Username == userDic["username"]).Single();
+            if (user != null)
+            {
+                if (user.UserPassword == hash(userDic["password"]))
+                {
+                    response.Message = "successful";
+                    response.roleId = user.RoleId;
+                }
+            }
+            else
+            {
+                //hiba
+                response.Message = "failed";
+            }
+        }
 
         public void requestHandler(Communication comm) {
 
-            switch (comm.requestName)
+            switch (comm.Message)
             {
                 case "addPart":
-                    addPart(comm.parameterObject);
+                    addPart(comm.contentObject);
                     break;
                 case "addProject":
-                    addProject(comm.parameterObject);
+                    addProject(comm.contentObject);
                     break;
                 case "addUser":
-                    addUser(comm.parameterObject);
+                    addUser(comm.contentObject);
                     break;
                 case "getParts":
                     getParts();
                     break;
                 case "getSingleProject":
-                    getSingleProject(comm.parameterObject);
+                    getSingleProject(comm.contentObject);
                     break;
                 case "getAllProjects":
                     getAllProjects();
+                    break;
+                case "modifyPartPrice":
+                    modifyPartPrice(comm.contentObject);
+                    break;
+                case "login":
+                    login(comm.contentObject);
                     break;
                 // TODO: changeProjectState id-k? 
                 default:
