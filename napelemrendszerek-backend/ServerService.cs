@@ -1,6 +1,6 @@
 ﻿using Comm;
 using napelemrendszerek_backend;
-using napelemrendszerek_backend.DBModels;
+using napelemrendszerek_backend.Models;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
@@ -59,7 +59,7 @@ namespace SocketServer
                 writer.AutoFlush = true;
 
                 JavaScriptSerializer serializer = new JavaScriptSerializer();
-
+                
                 while (true)
                 {
                     string requestStr = await reader.ReadLineAsync();
@@ -67,8 +67,9 @@ namespace SocketServer
                     {
                         Communication request = serializer.Deserialize<Communication>(requestStr);
                         Console.WriteLine("Received service request: " + request);
-                        Communication response = Response(request);
-                        Console.WriteLine("Computed response is: " + response + "\n");
+                        DbServices services = new DbServices();
+                        services.requestHandler(request);
+                        Communication response = services.getResponse();
                         await writer.WriteLineAsync(serializer.Serialize(response));
                     }
                     else
@@ -87,11 +88,6 @@ namespace SocketServer
                 }
                 Console.WriteLine("Connection closed, client: " + clientEndPoint);
             }
-        }
-        private static Communication Response(Communication request)
-        {
-            Communication response = new Communication(request.requestName + " (Server)", null , 1);
-            return response;
         }
     }
 }
