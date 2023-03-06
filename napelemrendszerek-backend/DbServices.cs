@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using napelemrendszerek_backend.Models;
-using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using System.Security.Cryptography;
 using Comm;
 
@@ -72,7 +71,9 @@ namespace napelemrendszerek_backend
                 //TODO: jelzés a kliensnek? 
             }
         }
-
+        public void teszt(string asd) {
+            Console.WriteLine(hash(asd));
+        }
         private void addProject(object o) { 
             Project p = (Project)o;
             //TODO: létezik már?
@@ -109,15 +110,16 @@ namespace napelemrendszerek_backend
         }
         private string hash(string password) {
 
-            byte[] salt = new byte[16]; 
-            string hashed = Convert.ToBase64String(KeyDerivation.Pbkdf2(
-                password: password,
-                salt: salt,
-                prf: KeyDerivationPrf.HMACSHA256,
-                iterationCount: 100000,
-                numBytesRequested: 256 / 8));
-
-            return hashed;
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(password));
+                StringBuilder stringbuilder = new StringBuilder();
+                for (int i = 0; i < bytes.Length; i++)
+                {
+                    stringbuilder.Append(bytes[i].ToString("x2"));
+                }
+                return stringbuilder.ToString();
+            }
         }
         private void login(object o)
         {
@@ -143,7 +145,11 @@ namespace napelemrendszerek_backend
                 response.Message = "failed";
             }
         }
-
+        private void setResponse(string message, object o=null, int? roleId=null) { 
+            response.Message = message;
+            response.contentObject = o;
+            response.roleId = roleId;
+        }
         public void requestHandler(Communication comm) {
 
             switch (comm.Message)
