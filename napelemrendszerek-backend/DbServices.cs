@@ -32,19 +32,47 @@ namespace napelemrendszerek_backend
         }
 
         private void  getAllProjects() {
-            //TODO kiszűrni az adott oszlopokat
-            response.Message = "nodata";
-            response.contentObject = SPContext.Project.ToList();
+            //role ellenőrzés?
+            List<Project> projects = SPContext.Project.ToList();
+            if (projects.Count == 0)
+            {
+                response.Message = "nodata";
+            }
+            else
+            {
+                response.Message = "successful";
+                response.contentObject = projects;
+            }
         }
 
-        private List<Project> getSingleProject(object o) {
+        private void getSingleProject(object o) {
+            //role ellenőrzés?
             int projectID = Convert.ToInt32(o.ToString());
-            return SPContext.Project.Where(p => p.ProjectId == projectID).ToList();
+            Project project = SPContext.Project.FirstOrDefault(p => p.ProjectId == projectID);
+            if (project != null)
+            {
+                response.Message = "successful";
+                response.contentObject = project;
+            }
+            else
+            {
+                response.Message = "failed";
+            }
         }
         
-        private List<Part> getParts() {
-            //TODO kiszűrni a db/dobozt
-            return SPContext.Part.ToList();
+        private void getParts() {
+            
+            //role ellenőrzés?
+            List<Part> parts = SPContext.Part.ToList();
+            if (parts.Count == 0)
+            {
+                response.Message = "nodata";
+            }
+            else
+            {
+                response.Message = "successful";
+                response.contentObject = parts;
+            }
         }
 
         private void changeProjectState(int projectID,int stateID ) {//dic
