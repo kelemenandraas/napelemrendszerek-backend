@@ -133,7 +133,11 @@ namespace napelemrendszerek_backend
             {
                 if (user.UserPassword == hash(userDic["password"]))
                 {
-                    setResponse("successful",null,user.RoleId);
+                    setResponse("successful", null, user.RoleId);
+                }
+                else 
+                {
+                    setResponse("wrongpassword");
                 }
             }
             else
