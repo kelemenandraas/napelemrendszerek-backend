@@ -71,9 +71,7 @@ namespace napelemrendszerek_backend
                 //TODO: jelzés a kliensnek? 
             }
         }
-        public void teszt(string asd) {
-            Console.WriteLine(hash(asd));
-        }
+
         private void addProject(object o) { 
             Project p = (Project)o;
             //TODO: létezik már?
@@ -135,7 +133,11 @@ namespace napelemrendszerek_backend
             {
                 if (user.UserPassword == hash(userDic["password"]))
                 {
-                    setResponse("successful",null,user.RoleId);
+                    setResponse("successful", null, user.RoleId);
+                }
+                else 
+                {
+                    setResponse("wrongpassword");
                 }
             }
             else
