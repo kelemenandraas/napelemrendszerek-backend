@@ -126,23 +126,22 @@ namespace napelemrendszerek_backend
             if (!(o is Dictionary<string,string>))
             {
                 //hiba
-                response.Message = "failed";
+                setResponse("failed");
                 return;
             }
             Dictionary<string, string> userDic = (Dictionary<string, string>)o;
-            var user = SPContext.Users.Where(x=>x.Username == userDic["username"]).Single();
+            var user = SPContext.Users.Select(x=>x).Where(x=>x.Username == userDic["username"]).FirstOrDefault();
             if (user != null)
             {
                 if (user.UserPassword == hash(userDic["password"]))
                 {
-                    response.Message = "successful";
-                    response.roleId = user.RoleId;
+                    setResponse("successful",null,user.RoleId);
                 }
             }
             else
             {
                 //hiba
-                response.Message = "failed";
+                setResponse("nodata");
             }
         }
         private void setResponse(string message, object o=null, int? roleId=null) { 

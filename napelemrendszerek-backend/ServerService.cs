@@ -12,7 +12,7 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
-
+using Newtonsoft.Json;
 namespace SocketServer
 {
     public class AsyncService
@@ -57,20 +57,18 @@ namespace SocketServer
                 StreamReader reader = new StreamReader(networkStream);
                 StreamWriter writer = new StreamWriter(networkStream);
                 writer.AutoFlush = true;
-
-                JavaScriptSerializer serializer = new JavaScriptSerializer();
-                
                 while (true)
                 {
                     string requestStr = await reader.ReadLineAsync();
                     if (requestStr != null)
                     {
-                        Communication request = serializer.Deserialize<Communication>(requestStr);
+
+                        Communication request = JsonConvert.DeserializeObject<Communication>(requestStr, new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto });
                         Console.WriteLine("Received service request: " + request);
                         DbServices services = new DbServices();
                         services.requestHandler(request);
                         Communication response = services.getResponse();
-                        await writer.WriteLineAsync(serializer.Serialize(response));
+                        await writer.WriteLineAsync(JsonConvert.SerializeObject(response,new JsonSerializerSettings() { TypeNameHandling = TypeNameHandling.Auto}));
                     }
                     else
                     {
