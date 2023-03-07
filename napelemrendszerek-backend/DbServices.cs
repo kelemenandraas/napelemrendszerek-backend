@@ -45,9 +45,19 @@ namespace napelemrendszerek_backend
             }
         }
 
-        private List<Project> getSingleProject(object o) {
+        private void getSingleProject(object o) {
+            //role ellenőrzés?
             int projectID = Convert.ToInt32(o.ToString());
-            return SPContext.Project.Where(p => p.ProjectId == projectID).ToList();
+            Project project = SPContext.Project.FirstOrDefault(p => p.ProjectId == projectID);
+            if (project != null)
+            {
+                response.Message = "successful";
+                response.contentObject = project;
+            }
+            else
+            {
+                response.Message = "failed";
+            }
         }
         
         private void getParts() {
