@@ -32,9 +32,17 @@ namespace napelemrendszerek_backend
         }
 
         private void  getAllProjects() {
-            //TODO kiszűrni az adott oszlopokat
-            response.Message = "nodata";
-            response.contentObject = SPContext.Project.ToList();
+            //role ellenőrzés?
+            List<Project> projects = SPContext.Project.ToList();
+            if (projects.Count == 0)
+            {
+                response.Message = "nodata";
+            }
+            else
+            {
+                response.Message = "successful";
+                response.contentObject = projects;
+            }
         }
 
         private List<Project> getSingleProject(object o) {
