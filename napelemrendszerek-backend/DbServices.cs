@@ -92,19 +92,40 @@ namespace napelemrendszerek_backend
         }
         private void modifyPartPrice(object o)
         {
-            //feltételezve hogy egy létező (adatb-ben létező id) partot kapunk, más árral
-            Part p = (Part)o;
-            var modifiedPart = SPContext.Part.FirstOrDefault(i => i.PartName == p.PartName);
+            if (!(o is Dictionary<string, string>))
+            {
+                setResponse("failed");
+                return;
+            }
+            Dictionary<string, string> modifiedPartDic = (Dictionary<string, string>)o;
+            //helyes kulcsok ellenőrzése
+            if (!(modifiedPartDic.ContainsKey("partName")) || !(modifiedPartDic.ContainsKey("sellPrice")))
+            {
+                setResponse("failed");
+                return;
+            }
+            var modifiedPart = SPContext.Part.FirstOrDefault(i => i.PartName == modifiedPartDic["partName"]);
             if (modifiedPart != null)
             {
-                modifiedPart.SellPrice = p.SellPrice;
-                SPContext.SaveChanges();
+                if (int.TryParse(modifiedPartDic["sellPrice"], out int newPartPrice))
+                {
+                    modifiedPart.SellPrice = newPartPrice;
+                    SPContext.SaveChanges();
+                    setResponse("successful");
+                }
+                else
+                {
+                    setResponse("failed");
+                    return;
+                }
+
             }
             else
             {
-                //TODO: hiba jelzése
+                //nincs olyan alkatrész
+                setResponse("nodata");
             }
-            
+
         }
         private string hash(string password) {
 
