@@ -200,37 +200,91 @@ namespace napelemrendszerek_backend
             response.contentObject = o;
             response.roleId = roleId;
         }
-        public void requestHandler(Communication comm) {
+        public void requestHandler(Communication comm)
+        {
+            // roleID 1 - Raktarvezeto, 2 - Raktaros, 3 - Szakember
+            int? roleID = comm.roleId;
 
             switch (comm.Message)
             {
                 case "addPart":
-                    addPart(comm.contentObject);
+                    if (roleID == 1)
+                    {
+                        addPart(comm.contentObject);
+                    }
+                    else
+                    {
+                        setResponse("denied");
+                    }
                     break;
+
                 case "addProject":
-                    addProject(comm.contentObject);
+                    if (roleID == 3)
+                    {
+                        addProject(comm.contentObject);
+                    }
+                    else
+                    {
+                        setResponse("denied");
+                    }
                     break;
+
                 case "addUser":
                     addUser(comm.contentObject);
                     break;
+
                 case "getParts":
-                    getParts();
+                    if (roleID == 1 || roleID == 2)
+                    {
+                        getParts();
+                    }
+                    else
+                    {
+                        setResponse("denied");
+                    }
                     break;
+
                 case "getSingleProject":
-                    getSingleProject(comm.contentObject);
+                    if (roleID == 2 || roleID == 3)
+                    {
+                        getSingleProject(comm.contentObject);
+                    }
+                    else
+                    {
+                        setResponse("denied");
+                    }
                     break;
+
                 case "getAllProjects":
-                    getAllProjects();
+                    if (roleID == 2 || roleID == 3)
+                    {
+                        getAllProjects();
+                    }
+                    else
+                    {
+                        setResponse("denied");
+                    }
                     break;
+
                 case "modifyPartPrice":
-                    modifyPartPrice(comm.contentObject);
+                    if (roleID == 1)
+                    {
+                        modifyPartPrice(comm.contentObject);
+                    }
+                    else
+                    {
+                        setResponse("denied");
+                    }
                     break;
+
                 case "login":
                     login(comm.contentObject);
                     break;
+
                 // TODO: changeProjectState id-k? 
+
                 default:
-                    Console.WriteLine("Nem létező kérés!");
+                    setResponse("unknown request");
                     break;
             }
         }
