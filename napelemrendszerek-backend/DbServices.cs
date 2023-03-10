@@ -32,46 +32,40 @@ namespace napelemrendszerek_backend
         }
 
         private void  getAllProjects() {
-            //role ellenőrzés?
             List<Project> projects = SPContext.Project.ToList();
             if (projects.Count == 0)
             {
-                response.Message = "nodata";
+                setResponse("nodata");
             }
             else
             {
-                response.Message = "successful";
-                response.contentObject = projects;
+                setResponse("successful", projects);
             }
         }
 
         private void getSingleProject(object o) {
-            //role ellenőrzés?
             int projectID = Convert.ToInt32(o.ToString());
             Project project = SPContext.Project.FirstOrDefault(p => p.ProjectId == projectID);
             if (project != null)
             {
-                response.Message = "successful";
-                response.contentObject = project;
+                setResponse("successful", project);
             }
             else
             {
-                response.Message = "failed";
+                setResponse("nodata");
             }
         }
         
         private void getParts() {
             
-            //role ellenőrzés?
             List<Part> parts = SPContext.Part.ToList();
             if (parts.Count == 0)
             {
-                response.Message = "nodata";
+                setResponse("nodata");
             }
             else
             {
-                response.Message = "successful";
-                response.contentObject = parts;
+                setResponse("successful", parts);
             }
         }
 
@@ -84,39 +78,61 @@ namespace napelemrendszerek_backend
         }
 
         private void addUser(object o) {
-
+            if (!(o is Users))
+            {
+                setResponse("failed");
+                return;
+            }
             Users singleUser = (Users)o;
-            if (!SPContext.Users.Any(i => i.Username == singleUser.Username))
+            if (SPContext.Users.Find(singleUser.Username) == null)
             {
                 string hashedPassword = hash(singleUser.UserPassword);
                 singleUser.UserPassword = hashedPassword;
                 SPContext.Users.Add(singleUser);
-                Console.WriteLine($"username: {singleUser.Username} password: {singleUser.UserPassword}");
                 SPContext.SaveChanges();
+                setResponse("successful");
             }
             else {
-                Console.WriteLine("hiba, benne van a felhasználó");
-                //TODO: jelzés a kliensnek? 
+                setResponse("already exists");
             }
         }
 
-        private void addProject(object o) { 
+        private void addProject(object o) {
+            if (!(o is Project))
+            {
+                setResponse("failed");
+                return;
+            }
             Project p = (Project)o;
-            //TODO: létezik már?
-            SPContext.Project.Add(p);
-            SPContext.SaveChanges();
+            if (SPContext.Part.Find(p.ProjectId) == null)
+            {
+                SPContext.Project.Add(p);
+                SPContext.SaveChanges();
+                setResponse("successful");
+            }
+            else
+            {
+                setResponse("already exists");
+            }
         }
 
         private void addPart(object o) {
             if (!(o is Part))
             {
-                response.Message = "failed";
-                //hiba
+                setResponse("failed");
+                return;
             }
             Part p = (Part)o;
-            //TODO: létezik már?
-            SPContext.Part.Add(p);
-            SPContext.SaveChanges();
+            if (SPContext.Part.Find(p.PartName) == null)
+            {
+                SPContext.Part.Add(p);
+                SPContext.SaveChanges();
+                setResponse("successful");
+            }
+            else
+            {
+                setResponse("already exists");
+            }
         }
         private void modifyPartPrice(object o)
         {
@@ -229,6 +245,7 @@ namespace napelemrendszerek_backend
                     }
                     break;
 
+                //admin role???
                 case "addUser":
                     addUser(comm.contentObject);
                     break;
